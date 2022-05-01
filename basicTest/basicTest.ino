@@ -45,6 +45,10 @@ void loop() {
   delay(1500);
   moveBackward();
   delay(500);
+  strafeLeft();
+  delay(1500);
+  strafeRight();
+  delay(500);
 }
 
 void enableMove(){
@@ -55,6 +59,11 @@ void enableMove(){
   analogWrite(ENBright, 255); 
 }
 
+/*----------------------------------
+  FL -> FORWARDS | FR -> FORWARDS
+                  |
+  BL -> FORWARDS  | BR -> FORWARDS
+----------------------------------*/
 void moveForward(){
   enableMove();
   digitalWrite(FrontRightF, HIGH);
@@ -67,6 +76,11 @@ void moveForward(){
   digitalWrite(BackLeftB, LOW);
 }
 
+/*----------------------------------
+  FL -> BACKWARDS | FR -> BACKWARDS
+                  |
+  BL -> BACKWARDS | BR -> BACKWARDS
+----------------------------------*/
 void moveBackward(){
   enableMove();
   digitalWrite(FrontRightF, LOW);
@@ -77,4 +91,48 @@ void moveBackward(){
   digitalWrite(FrontLeftB, HIGH);
   digitalWrite(BackLeftF, LOW);
   digitalWrite(BackLeftB, HIGH);
+}
+
+/*----------------------------------
+  FL -> BACKWARDS | FR -> FORWARDS
+                  |
+  BL -> FORWARDS  | BR -> BACKWARDS
+----------------------------------*/
+void strafeRight(){
+  enableMove();
+  digitalWrite(FrontRightF, HIGH);
+  digitalWrite(FrontRightB, LOW);
+  digitalWrite(BackRightF, LOW);
+  digitalWrite(BackRightB, HIGH);
+  digitalWrite(FrontLeftF, LOW);
+  digitalWrite(FrontLeftB, HIGH);
+  digitalWrite(BackLeftF, HIGH);
+  digitalWrite(BackLeftB, LOW);
+}
+
+/*----------------------------------
+  FL -> FORWARDS  | FR -> BACKWARDS
+                  |
+  BL -> BACKWARDS | BR -> FORWARDS
+----------------------------------*/
+void strafeLeft(){
+  enableMove();
+  digitalWrite(FrontRightF, LOW);
+  digitalWrite(FrontRightB, HIGH);
+  digitalWrite(BackRightF, HIGH);
+  digitalWrite(BackRightB, LOW);
+  digitalWrite(FrontLeftF, HIGH);
+  digitalWrite(FrontLeftB, LOW);
+  digitalWrite(BackLeftF, LOW);
+  digitalWrite(BackLeftB, HIGH);
+}
+
+void rotate(int angle){
+  /*
+    Input: angle can be both positive and negative
+    Implement:
+      1. Read initial yaw from gyroscope data
+      2. Calculate final yaw = initial + angle
+      3. Rotate bot until final yaw reached
+  */
 }
