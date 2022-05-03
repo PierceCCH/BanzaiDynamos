@@ -1,47 +1,62 @@
 // --------------- LIBRARIES ---------------
 #include "Wire.h"
 #include <MPU6050_light.h>
+
 // -------------- DEFINE PINS -------------- 
 // ---------- MOTORS ----------
-// -- RIGHT SIDE
-// FRONT RIGHT MOTOR
 const int FrontRightF = 13;
 const int FrontRightB = 12;
-// BACK RIGHT MOTOR
 const int BackRightF = 11;
 const int BackRightB = 10;
+const int FrontLeftF = 9;
+const int FrontLeftB = 8;
+const int BackLeftF = 7;
+const int BackLeftB = 6;
 // RIGHT H-Bridge pins
 const int ENAright = A0; // Enables motor 
 const int ENBright = A1;
-// -- LEFT SIDE
-// FRONT LEFT MOTOR
-const int FrontLeftF = 9;
-const int FrontLeftB = 8;
-// BACK LEFT MOTOR
-const int BackLeftF = 7;
-const int BackLeftB = 6;
 // LEFT H-Bridge 
 const int ENAleft = A2;
 const int ENBleft = A3;
+
+// ------ ULTRASONIC SENSORS ------
+const int EchoFrontLeft = 22;
+const int TrigFrontLeft = 23;
+const int EchoFrontMid = 24;
+const int TrigFrontMid = 25;
+const int EchoFrontRight = 26;
+const int TrigFrontRight = 27;
+const int EchoLeft = 28;
+const int TrigLeft = 29;
+const int EchoRight = 30;
+const int TrigRight = 31;
+const int EchoBack = 32;
+const int TrigBack = 33;
+
 // ------------------------------------
 // -------- VARIABLES ---------
-MPU6050 mpu(Wire); // Gyroscope
+// -- Gyroscope
+MPU6050 mpu(Wire);
 unsigned long timer = 0;
 
 void setup() {
 // -- Motor pin setup --
-  pinMode (FrontRightF, OUTPUT);
-  pinMode (FrontRightB, OUTPUT);
-  pinMode (BackRightB, OUTPUT);
-  pinMode (BackRightF, OUTPUT);
+  for (int i = BackLeftB; i <= FrontRightF; i++){
+    pinMode(i, output);
+  }
   pinMode (ENAright, OUTPUT);
   pinMode (ENBright, OUTPUT);
-  pinMode (FrontLeftF, OUTPUT);
-  pinMode (FrontLeftB, OUTPUT);
-  pinMode (BackLeftB, OUTPUT);
-  pinMode (BackLeftF, OUTPUT);
   pinMode (ENAleft, OUTPUT);
   pinMode (ENBleft, OUTPUT);
+
+// -- Ultrasonic sensor setup ----
+  for (int i = EchoFrontLeft; i <= TrigBack; i++){
+    if (i%2 == 0){ // ECHO PINS MUST BE EVEN PINS
+      pinMode(i, INPUT);
+    } else { // TRIG PINS MUST BE ODD PINS
+      pinMode(i, OUTPUT);
+    }
+  }
 
 // -- Gyroscope setup --
   Serial.begin(9600);
@@ -54,15 +69,8 @@ void setup() {
 }
 
 void loop() {
-  delay(500);
-  moveForward();
-  delay(1500);
-  moveBackward();
-  delay(500);
-  strafeLeft();
-  delay(1500);
-  strafeRight();
-  delay(500);
+  motorTestSequence();
+  stopMove();
 }
 
 // ------ WHEEL MOTOR CONTROLLERS ------
@@ -175,32 +183,71 @@ void strafeLeft(){
 int getYaw(){
   return mpu.getAngleZ();
 }
-
 void rotate(int angle){
   /*
     Angle POSITIVE for ACW rotation, negative for CW rotation
   */
   int currentAngle = getYaw();
   int finalAngle = currentAngle + angle;
-  while (currentAngle != finalAngle){
+  while (currentAngle > (finalAngle - 1) || currentAngle < (finalAngle + 1)){ // Allow for a certain threshold
     if (angle < 0){ // CW rotation
       enableMove();
       frontRightForward();
       frontLeftBackwards();
       backRightForward();
       backLeftBackwards();
-      delay(50);
+      delay(50); // time spent rotating
       stopMove();
     } else {
       enableMove();
-      frontRightForward();
+      frontRightBackwards();
       frontLeftForward();
       backRightBackwards();
       backLeftForward();
       delay(50);
       stopMove();
     }
-    delay(50);
     currentAngle = getYaw();
   }
+}
+
+// ------ Ultrasonic Sensor Controller -------
+int getDistanceFromSensor(int trigPin, int echoPin){
+  // Clear trig pin
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  // Reads echo and uses return time to calculate the distance
+  int distance = pulseIn(echoPin, HIGH) * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
+  // Displays the distance on the Serial Monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+  return distance;
+}
+
+void motorTestSequence(){
+  delay(500);
+  moveForward();
+  delay(1000);
+  stopMove();
+  moveBackward();
+  delay(1000);
+  stopMove();
+  strafeLeft();
+  delay(1000);
+  stopMove();
+  strafeRight();
+  delay(1000);
+
+  rotate(180);
+  delay(500);
+  rotate(180);
+  delay(500);
+  rotate(-180);
+  delay(500);
+  rotate(-180);
+  delay(500);
 }
