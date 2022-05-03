@@ -1,5 +1,6 @@
 // --------------- LIBRARIES ---------------
 #include "Wire.h"
+#include <Servo.h>
 #include <MPU6050_light.h>
 
 // -------------- DEFINE PINS -------------- 
@@ -33,16 +34,18 @@ const int TrigRight = 31;
 const int EchoBack = 32;
 const int TrigBack = 33;
 
+// -------- CLAW SERVO --------
+const int ClawServo = 3;
+
 // ------------------------------------
 // -------- VARIABLES ---------
-// -- Gyroscope
-MPU6050 mpu(Wire);
-unsigned long timer = 0;
+MPU6050 mpu(Wire); // -- Gyroscope
+Servo claw;
 
 void setup() {
 // -- Motor pin setup --
   for (int i = BackLeftB; i <= FrontRightF; i++){
-    pinMode(i, output);
+    pinMode(i, OUTPUT);
   }
   pinMode (ENAright, OUTPUT);
   pinMode (ENBright, OUTPUT);
@@ -66,11 +69,16 @@ void setup() {
   Serial.println(F("Calculating offsets, do not move MPU6050"));
   delay(1000);
   mpu.calcOffsets();
+
+// -- Servo setup --
+  claw.attach(ClawServo);
 }
 
 void loop() {
   motorTestSequence();
   stopMove();
+  openClaw();
+  closeClaw();
 }
 
 // ------ WHEEL MOTOR CONTROLLERS ------
@@ -211,7 +219,7 @@ void rotate(int angle){
   }
 }
 
-// ------ Ultrasonic Sensor Controller -------
+// ------ Ultrasonic Sensor Controller ------
 int getDistanceFromSensor(int trigPin, int echoPin){
   // Clear trig pin
   digitalWrite(trigPin, LOW);
@@ -226,6 +234,21 @@ int getDistanceFromSensor(int trigPin, int echoPin){
   Serial.print(distance);
   Serial.println(" cm");
   return distance;
+}
+
+// ------ Claw Controller ------
+void openClaw(){
+    for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    claw.write(pos);   // tell servo to go to position 'pos'
+    delay(15);  // waits 15ms for the servo to reach the position
+  }
+}
+void closeClaw(){
+    for (pos = 0; pos <= 180; pos -= 1) {
+    // in steps of 1 degree
+    claw.write(pos);
+    delay(15); 
 }
 
 void motorTestSequence(){
