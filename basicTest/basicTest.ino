@@ -1,6 +1,7 @@
-
+// --------------- LIBRARIES ---------------
+#include "Wire.h"
+#include <MPU6050_light.h>
 // -------------- DEFINE PINS -------------- 
-// 
 // ---------- MOTORS ----------
 // -- RIGHT SIDE
 // FRONT RIGHT MOTOR
@@ -23,8 +24,12 @@ const int BackLeftB = 6;
 const int ENAleft = A2;
 const int ENBleft = A3;
 // ------------------------------------
+// -------- VARIABLES ---------
+MPU6050 mpu(Wire); // Gyroscope
+unsigned long timer = 0;
 
 void setup() {
+// -- Motor pin setup --
   pinMode (FrontRightF, OUTPUT);
   pinMode (FrontRightB, OUTPUT);
   pinMode (BackRightB, OUTPUT);
@@ -37,6 +42,15 @@ void setup() {
   pinMode (BackLeftF, OUTPUT);
   pinMode (ENAleft, OUTPUT);
   pinMode (ENBleft, OUTPUT);
+
+// -- Gyroscope setup --
+  Serial.begin(9600);
+  Wire.begin();
+  byte status = mpu.begin();
+  Serial.println(status);
+  Serial.println(F("Calculating offsets, do not move MPU6050"));
+  delay(1000);
+  mpu.calcOffsets();
 }
 
 void loop() {
@@ -51,6 +65,7 @@ void loop() {
   delay(500);
 }
 
+// ------ WHEEL MOTOR CONTROLLERS ------
 void enableMove(){
 //control speed 
   analogWrite(ENAleft, 255);
@@ -59,6 +74,52 @@ void enableMove(){
   analogWrite(ENBright, 255); 
 }
 
+void stopMove(){
+  analogWrite(ENAleft, 0);
+  analogWrite(ENBleft, 0); 
+  analogWrite(ENAright, 0);
+  analogWrite(ENBright, 0); 
+}
+
+void frontRightForward(){
+  digitalWrite(FrontRightF, HIGH);
+  digitalWrite(FrontRightB, LOW);
+}
+
+void frontRightBackwards(){
+  digitalWrite(FrontRightF, LOW);
+  digitalWrite(FrontRightB, HIGH);
+}
+
+void frontLeftForward(){
+  digitalWrite(FrontLeftF, HIGH);
+  digitalWrite(FrontLeftB, LOW);
+}
+
+void frontLeftBackwards(){
+  digitalWrite(FrontLeftF, LOW);
+  digitalWrite(FrontLeftB, HIGH);
+}
+
+void backRightForward(){
+  digitalWrite(BackRightF, HIGH);
+  digitalWrite(BackRightB, LOW);
+}
+
+void backRightBackwards(){
+  digitalWrite(BackRightF, LOW);
+  digitalWrite(BackRightB, HIGH);
+}
+
+void backLeftForward(){
+  digitalWrite(BackLeftF, HIGH);
+  digitalWrite(BackLeftB, LOW);
+}
+
+void backLeftBackwards(){
+  digitalWrite(BackLeftF, LOW);
+  digitalWrite(BackLeftB, HIGH);
+}
 /*----------------------------------
   FL -> FORWARDS | FR -> FORWARDS
                   |
@@ -66,14 +127,10 @@ void enableMove(){
 ----------------------------------*/
 void moveForward(){
   enableMove();
-  digitalWrite(FrontRightF, HIGH);
-  digitalWrite(FrontRightB, LOW);
-  digitalWrite(BackRightF, HIGH);
-  digitalWrite(BackRightB, LOW);
-  digitalWrite(FrontLeftF, HIGH);
-  digitalWrite(FrontLeftB, LOW);
-  digitalWrite(BackLeftF, HIGH);
-  digitalWrite(BackLeftB, LOW);
+  frontRightForward();
+  frontLeftForward();
+  backLeftForward();
+  backRightForward();
 }
 
 /*----------------------------------
@@ -83,14 +140,10 @@ void moveForward(){
 ----------------------------------*/
 void moveBackward(){
   enableMove();
-  digitalWrite(FrontRightF, LOW);
-  digitalWrite(FrontRightB, HIGH);
-  digitalWrite(BackRightF, LOW);
-  digitalWrite(BackRightB, HIGH);
-  digitalWrite(FrontLeftF, LOW);
-  digitalWrite(FrontLeftB, HIGH);
-  digitalWrite(BackLeftF, LOW);
-  digitalWrite(BackLeftB, HIGH);
+  frontLeftBackwards();
+  frontRightBackwards();
+  backLeftBackwards();
+  backRightBackwards();
 }
 
 /*----------------------------------
@@ -100,14 +153,10 @@ void moveBackward(){
 ----------------------------------*/
 void strafeRight(){
   enableMove();
-  digitalWrite(FrontRightF, HIGH);
-  digitalWrite(FrontRightB, LOW);
-  digitalWrite(BackRightF, LOW);
-  digitalWrite(BackRightB, HIGH);
-  digitalWrite(FrontLeftF, LOW);
-  digitalWrite(FrontLeftB, HIGH);
-  digitalWrite(BackLeftF, HIGH);
-  digitalWrite(BackLeftB, LOW);
+  frontLeftBackwards();
+  frontRightForward();
+  backLeftBackwards();
+  backLeftForward();
 }
 
 /*----------------------------------
@@ -117,22 +166,41 @@ void strafeRight(){
 ----------------------------------*/
 void strafeLeft(){
   enableMove();
-  digitalWrite(FrontRightF, LOW);
-  digitalWrite(FrontRightB, HIGH);
-  digitalWrite(BackRightF, HIGH);
-  digitalWrite(BackRightB, LOW);
-  digitalWrite(FrontLeftF, HIGH);
-  digitalWrite(FrontLeftB, LOW);
-  digitalWrite(BackLeftF, LOW);
-  digitalWrite(BackLeftB, HIGH);
+  frontLeftForward();
+  frontRightBackwards();
+  backLeftBackwards();
+  backRightForward();
+}
+
+int getYaw(){
+  return mpu.getAngleZ();
 }
 
 void rotate(int angle){
   /*
-    Input: angle can be both positive and negative
-    Implement:
-      1. Read initial yaw from gyroscope data
-      2. Calculate final yaw = initial + angle
-      3. Rotate bot until final yaw reached
+    Angle POSITIVE for ACW rotation, negative for CW rotation
   */
+  int currentAngle = getYaw();
+  int finalAngle = currentAngle + angle;
+  while (currentAngle != finalAngle){
+    if (angle < 0){ // CW rotation
+      enableMove();
+      frontRightForward();
+      frontLeftBackwards();
+      backRightForward();
+      backLeftBackwards();
+      delay(50);
+      stopMove();
+    } else {
+      enableMove();
+      frontRightForward();
+      frontLeftForward();
+      backRightBackwards();
+      backLeftForward();
+      delay(50);
+      stopMove();
+    }
+    delay(50);
+    currentAngle = getYaw();
+  }
 }
