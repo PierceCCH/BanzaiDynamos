@@ -75,10 +75,13 @@ void setup() {
 }
 
 void loop() {
-  motorTestSequence();
-  stopMove();
-  openClaw();
-  closeClaw();
+//  motorTestSequence();
+  delay(100);
+  rotate(-180);
+  delay(1000);
+//  stopMove();
+//  openClaw();
+//  closeClaw();
 }
 
 // ------ WHEEL MOTOR CONTROLLERS ------
@@ -167,7 +170,7 @@ void moveBackward(){
                   |
   BL -> FORWARDS  | BR -> BACKWARDS
 ----------------------------------*/
-void strafeRight(){
+void strafeLeft(){
   enableMove();
   frontLeftBackwards();
   frontRightForward();
@@ -180,7 +183,7 @@ void strafeRight(){
                   |
   BL -> BACKWARDS | BR -> FORWARDS
 ----------------------------------*/
-void strafeLeft(){
+void strafeRight(){
   enableMove();
   frontLeftForward();
   frontRightBackwards();
@@ -189,6 +192,7 @@ void strafeLeft(){
 }
 
 int getYaw(){
+  mpu.update();
   return mpu.getAngleZ();
 }
 void rotate(int angle){
@@ -197,25 +201,28 @@ void rotate(int angle){
   */
   int currentAngle = getYaw();
   int finalAngle = currentAngle + angle;
-  while (currentAngle > (finalAngle - 1) || currentAngle < (finalAngle + 1)){ // Allow for a certain threshold
-    if (angle < 0){ // CW rotation
+  
+  while (abs(currentAngle) < abs(finalAngle - 1)){ // Allow for a certain threshold
+    if (angle < 0){ // ACW rotation
       enableMove();
       frontRightForward();
       frontLeftBackwards();
       backRightForward();
       backLeftBackwards();
-      delay(50); // time spent rotating
+      delay(10); // time spent rotating
       stopMove();
-    } else {
+    } else { // CW rotation
       enableMove();
       frontRightBackwards();
       frontLeftForward();
       backRightBackwards();
       backLeftForward();
-      delay(50);
+      delay(10);
       stopMove();
     }
     currentAngle = getYaw();
+    Serial.println(currentAngle);
+    Serial.println(finalAngle);
   }
 }
 
@@ -238,17 +245,18 @@ int getDistanceFromSensor(int trigPin, int echoPin){
 
 // ------ Claw Controller ------
 void openClaw(){
-    for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    for (int pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     claw.write(pos);   // tell servo to go to position 'pos'
     delay(15);  // waits 15ms for the servo to reach the position
   }
 }
 void closeClaw(){
-    for (pos = 0; pos <= 180; pos -= 1) {
+    for (int pos = 180; pos >= 0; pos -= 1) {
     // in steps of 1 degree
     claw.write(pos);
-    delay(15); 
+    delay(15);
+   }
 }
 
 void motorTestSequence(){
