@@ -1,5 +1,16 @@
 #include "motorControllers.h"
 #include "gyroscope.h"
+#include "ArduPID.h"
+
+ArduPID myController;
+
+// ------- PID Variables -------
+double setpoint = 512;
+double input;
+double output;
+double p = 1;
+double i = 0;
+double d = 0;
 
 // -------------- DEFINE PINS --------------
 const int FrontRightF = 13;
@@ -25,6 +36,10 @@ void setupMotors(){
     pinMode (ENBright, OUTPUT);
     pinMode (ENAleft, OUTPUT);
     pinMode (ENBleft, OUTPUT);
+    myController.begin(&input, &output, &setpoint, p, i, d);
+
+    myController.compute();
+
 }
 
 // ------ WHEEL MOTOR CONTROLLERS ------

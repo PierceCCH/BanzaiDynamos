@@ -11,5 +11,30 @@ void setup(){
 }
 
 void loop(){
+    delay(100);
+    motorTestSequence();
+}
 
+void motorTestSequence(){
+    delay(500);
+    moveForward();
+    delay(1000);
+    stopMove();
+    moveBackward();
+    delay(1000);
+    stopMove();
+    strafeLeft();
+    delay(1000);
+    stopMove();
+    strafeRight();
+    delay(1000);
+
+    rotate(180);
+    delay(500);
+    rotate(180);
+    delay(500);
+    rotate(-180);
+    delay(500);
+    rotate(-180);
+    delay(500);
 }
