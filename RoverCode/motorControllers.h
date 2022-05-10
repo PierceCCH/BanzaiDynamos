@@ -4,8 +4,7 @@
 
 void setupMotors();
 
-// Starts / Stops all rovers
-//void enableMove();
+// Stops all motors
 void stopMove();
 
 // Individual Motor Controllers

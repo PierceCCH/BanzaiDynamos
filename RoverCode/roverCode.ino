@@ -3,38 +3,109 @@
 #include "clawController.h"
 #include "gyroscope.h"
 
+constexpr int kObstacleThresh = 5;
+constexpr int kCollWallThresh = 10;
+constexpr int kZoneWallThresh = 200; //TODO
+constexpr int kTargetThresh = -1; // TODO
+
+int state;
+
 void setup(){
     setupMotors();
     setupUltrasonicSensors();
     setupClaw();
     setupGyroscope();
+    
+    state = 0;
 }
 
 void loop(){
-    delay(100);
-    moveForward();
+    switch(state) {
+      case 0: // Navigate obstacles
+        int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
+        int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
+        if (obstacle_FL < kObstacleThresh || obstacle_FR < kObstacleThresh) {
+            stopMove();
+            avoidObstacle();
+            moveForward();
+        }
+        else {
+            moveForward();
+            int wall_L = getDistanceFromSensor(kTrigL, kEchoL);
+            int wall_R = getDistanceFromSensor(kTrigR, kEchoR);
+            if ((wall_L + wall_R) > kZoneWallThresh) {
+                ++case;
+            }
+        }
+      case 1: // Find target
+        ++case;
+      case 2: // Transport target
+        ++case;
+      case 3: // Finish execution
+        return;
+    }
 }
 
-void motorTestSequence(){
-    delay(500);
-    moveForward();
-    delay(1000);
-    stopMove();
-    moveBackward();
-    delay(1000);
-    stopMove();
-    strafeLeft();
-    delay(1000);
-    stopMove();
-    strafeRight();
-    delay(1000);
-
-    rotate(180);
-    delay(500);
-    rotate(180);
-    delay(500);
-    rotate(-180);
-    delay(500);
-    rotate(-180);
-    delay(500);
+void avoidObstacle() {
+    int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
+    int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
+    if (obstacle_FL < kObstacleThresh) {
+        if (obstacle_FR < kObstacleThresh) {
+            int random_dir = random(0, 2);
+            switch(dir) {
+              case 0:
+                strafeLeft();
+                break;
+              case 1:
+                strafeRight();
+                break;
+            }
+            
+            int wall_L;
+            int wall_R;
+            for (;;) {
+                obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
+                obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
+                wall_L; = getDistanceFromSensor(kTrigL, kEchoL);
+                wall_R; = getDistanceFromSensor(kTrigR, kEchoR);
+                if (!(obstacle_FL < kObstacleThresh ||
+                        obstacle_FR < kObstacleThresh)) {
+                    stopMove();
+                    return;
+                }
+                else if (wall_L < kCollWallThresh) {
+                    stopMove();
+                    strafeRight();
+                }
+                else if (wall_R < kCollWallThresh) {
+                    stopMove();
+                    strafeLeft();
+            }
+        }
+        else {
+            strafeRight();
+            for (;;) {
+                obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
+                if (!(obstacle_FL < kObstacleThresh)) {
+                    stopMove();
+                    return;
+                }
+            }
+        }
+    }
+    else {
+        if (obstacle_FR < kObstacleThresh) {
+            strafeLeft();
+            for (;;) {
+                obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
+                if (!(obstacle_FR < kObstacleThresh)) {
+                    stopMove();
+                    return;
+                }
+            }
+        }
+        else {
+            return;
+        }
+    }
 }
