@@ -65,8 +65,8 @@ void avoidObstacle() {
             for (;;) {
                 obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
                 obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
-                wall_L; = getDistanceFromSensor(kTrigL, kEchoL);
-                wall_R; = getDistanceFromSensor(kTrigR, kEchoR);
+                wall_L = getDistanceFromSensor(kTrigL, kEchoL);
+                wall_R = getDistanceFromSensor(kTrigR, kEchoR);
                 if (!(obstacle_FL < kObstacleThresh ||
                         obstacle_FR < kObstacleThresh)) {
                     stopMove();
