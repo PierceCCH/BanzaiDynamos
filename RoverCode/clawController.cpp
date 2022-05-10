@@ -1,7 +1,6 @@
 #include "clawController.h"
 #include <Servo.h>
 
-const int ClawServo = 3;
 Servo claw;
 
 void setupClaw(){

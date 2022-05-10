@@ -12,22 +12,6 @@ double p = 1;
 double i = 1;
 double d = 1;
 
-// -------------- DEFINE PINS --------------
-const int FrontRightF = 13;
-const int FrontRightB = 12;
-const int BackRightF = 11;
-const int BackRightB = 10;
-const int FrontLeftF = 9;
-const int FrontLeftB = 8;
-const int BackLeftF = 7;
-const int BackLeftB = 6;
-// RIGHT H-Bridge pins
-const int ENAright = A0; // Enables motor 
-const int ENBright = A1;
-// LEFT H-Bridge 
-const int ENAleft = A2;
-const int ENBleft = A3;
-
 void setupMotors(){
     for (int i = BackLeftB; i <= FrontRightF; i++){
         pinMode(i, OUTPUT);
@@ -38,16 +22,6 @@ void setupMotors(){
     pinMode (ENBleft, OUTPUT);
     myController.begin(&input, &output, &setpoint, p, i, d);
 }
-
-// ------ WHEEL MOTOR CONTROLLERS ------
-// void enableMove(){
-// //control speed 
-//   myController.start();
-//   analogWrite(ENAleft, 255);
-//   analogWrite(ENBleft, 255); 
-//   analogWrite(ENAright, 255);
-//   analogWrite(ENBright, 255); 
-// }
 
 void stopMove(){
   myController.stop();
@@ -118,62 +92,16 @@ void setBackLeft(int speed){
   }
 }
 
-// void frontRightForward(){
-//   input = getYaw();
-//   digitalWrite(FrontRightF, HIGH);
-//   digitalWrite(FrontRightB, LOW);
-// }
-
-// void frontRightBackwards(){
-//   digitalWrite(FrontRightF, LOW);
-//   digitalWrite(FrontRightB, HIGH);
-// }
-
-// void frontLeftForward(){
-//   digitalWrite(FrontLeftF, HIGH);
-//   digitalWrite(FrontLeftB, LOW);
-// }
-
-// void frontLeftBackwards(){
-//   digitalWrite(FrontLeftF, LOW);
-//   digitalWrite(FrontLeftB, HIGH);
-// }
-
-// void backRightForward(){
-//   digitalWrite(BackRightF, HIGH);
-//   digitalWrite(BackRightB, LOW);
-// }
-
-// void backRightBackwards(){
-//   digitalWrite(BackRightF, LOW);
-//   digitalWrite(BackRightB, HIGH);
-// }
-
-// void backLeftForward(){
-//   digitalWrite(BackLeftF, HIGH);
-//   digitalWrite(BackLeftB, LOW);
-// }
-
-// void backLeftBackwards(){
-//   digitalWrite(BackLeftF, LOW);
-//   digitalWrite(BackLeftB, HIGH);
-// }
 /*----------------------------------
   FL -> FORWARDS | FR -> FORWARDS
                   |
   BL -> FORWARDS  | BR -> FORWARDS
 ----------------------------------*/
 void moveForward(){
-  // enableMove();
-  // frontRightForward();
-  // frontLeftForward();
-  // backLeftForward();
-  // backRightForward();
-
   setFrontRight(255);
-  setBackLeft(255);
   setBackRight(255);
   setFrontLeft(255);
+  setBackLeft(255);
 }
 
 /*----------------------------------
@@ -182,15 +110,10 @@ void moveForward(){
   BL -> BACKWARDS | BR -> BACKWARDS
 ----------------------------------*/
 void moveBackward(){
-  // enableMove();
-  // frontLeftBackwards();
-  // frontRightBackwards();
-  // backLeftBackwards();
-  // backRightBackwards();
   setFrontRight(-255);
-  setBackLeft(-255);
   setBackRight(-255);
   setFrontLeft(-255);
+  setBackLeft(-255);
 }
 
 /*----------------------------------
@@ -199,15 +122,10 @@ void moveBackward(){
   BL -> FORWARDS  | BR -> BACKWARDS
 ----------------------------------*/
 void strafeLeft(){
-  // enableMove();
-  // frontLeftBackwards();
-  // frontRightForward();
-  // backLeftBackwards();
-  // backLeftForward();
   setFrontRight(255);
-  setBackLeft(255);
   setBackRight(-255);
   setFrontLeft(-255);
+  setBackLeft(255);
 }
 
 /*----------------------------------
@@ -216,16 +134,10 @@ void strafeLeft(){
   BL -> BACKWARDS | BR -> FORWARDS
 ----------------------------------*/
 void strafeRight(){
-  // enableMove();
-  // frontLeftForward();
-  // frontRightBackwards();
-  // backLeftBackwards();
-  // backRightForward();
   setFrontRight(-255);
-  setBackLeft(-255);
   setBackRight(255);
   setFrontLeft(255);
-
+  setBackLeft(-255);
 }
 
 void rotate(int angle){
