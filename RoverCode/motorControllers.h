@@ -4,11 +4,11 @@
 
 void setupMotors();
 
-// Starts / Stops all rovers
+// Starts / Stops all motors
 void enableMove();
 void stopMove();
 
-// Individual Motor Controllers
+// Individual motor controllers
 void frontRightForward();
 void frontRightBackwards();
 void frontLeftForward();

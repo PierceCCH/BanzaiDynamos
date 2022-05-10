@@ -1,20 +1,20 @@
 #include "ultrasonicSensors.h"
 
-const int EchoFrontLeft = 22;
-const int TrigFrontLeft = 23;
-const int EchoFrontMid = 24;
-const int TrigFrontMid = 25;
-const int EchoFrontRight = 26;
-const int TrigFrontRight = 27;
-const int EchoLeft = 28;
-const int TrigLeft = 29;
-const int EchoRight = 30;
-const int TrigRight = 31;
-const int EchoBack = 32;
-const int TrigBack = 33;
+constexpr int kEchoFL = 22;
+constexpr int kTrigFL = 23;
+constexpr int kEchoFM = 24;
+constexpr int kTrigFM = 25;
+constexpr int kEchoFR = 26;
+constexpr int kTrigFR = 27;
+constexpr int kEchoL = 28;
+constexpr int kTrigL = 29;
+constexpr int kEchoR = 30;
+constexpr int kTrigR = 31;
+constexpr int kEchoB = 32;
+constexpr int kTrigB = 33;
 
 void setupUltrasonicSensors(){
-    for (int i = EchoFrontLeft; i <= TrigBack; i++){
+    for (int i = kEchoFL; i <= kTrigB; i++){
         if (i%2 == 0){ // ECHO PINS MUST BE EVEN PINS
             pinMode(i, INPUT);
         } else { // TRIG PINS MUST BE ODD PINS
@@ -31,7 +31,7 @@ int getDistanceFromSensor(int trigPin, int echoPin){
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
     // Reads echo and uses return time to calculate the distance
-    int distance = pulseIn(echoPin, HIGH) * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
+    int distance = pulseIn(echoPin, HIGH) * 0.0343 / 2; // Speed of sound wave divided by 2 (go and back)
     // Displays the distance on the Serial Monitor
     Serial.print("Distance: ");
     Serial.print(distance);
