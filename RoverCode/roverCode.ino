@@ -28,19 +28,18 @@ void loop(){
             stopMove();
             avoidObstacle();
             moveForward();
-        }
-        else {
+        } else {
             moveForward();
             int wall_L = getDistanceFromSensor(kTrigL, kEchoL);
             int wall_R = getDistanceFromSensor(kTrigR, kEchoR);
             if ((wall_L + wall_R) > kZoneWallThresh) {
-                ++case;
+                ++state;
             }
         }
       case 1: // Find target
-        ++case;
+        ++state;
       case 2: // Transport target
-        ++case;
+        ++state;
       case 3: // Finish execution
         return;
     }
@@ -52,7 +51,7 @@ void avoidObstacle() {
     if (obstacle_FL < kObstacleThresh) {
         if (obstacle_FR < kObstacleThresh) {
             int random_dir = random(0, 2);
-            switch(dir) {
+            switch(random_dir) {
               case 0:
                 strafeLeft();
                 break;
@@ -80,9 +79,9 @@ void avoidObstacle() {
                 else if (wall_R < kCollWallThresh) {
                     stopMove();
                     strafeLeft();
+                }
             }
-        }
-        else {
+        } else {
             strafeRight();
             for (;;) {
                 obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
@@ -92,8 +91,7 @@ void avoidObstacle() {
                 }
             }
         }
-    }
-    else {
+    } else {
         if (obstacle_FR < kObstacleThresh) {
             strafeLeft();
             for (;;) {
@@ -103,8 +101,7 @@ void avoidObstacle() {
                     return;
                 }
             }
-        }
-        else {
+        } else {
             return;
         }
     }
