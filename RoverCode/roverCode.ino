@@ -12,7 +12,7 @@ void setup(){
 
 void loop(){
     delay(100);
-    motorTestSequence();
+    moveForward();
 }
 
 void motorTestSequence(){

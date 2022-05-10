@@ -5,18 +5,16 @@
 void setupMotors();
 
 // Starts / Stops all rovers
-void enableMove();
+//void enableMove();
 void stopMove();
 
 // Individual Motor Controllers
-void frontRightForward();
-void frontRightBackwards();
-void frontLeftForward();
-void frontLeftBackwards();
-void backRightForward();
-void backRightBackwards();
-void backLeftForward();
-void backLeftBackwards();
+
+
+void setFrontLeft(int speed);
+void setFrontRight(int speed);
+void setBackLeft(int speed);
+void setBackRight(int speed);
 
 // Generic rover movement
 void moveForward();
