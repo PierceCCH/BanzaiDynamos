@@ -3,10 +3,14 @@
 #include "clawController.h"
 #include "gyroscope.h"
 
-constexpr int kObstacleThresh = 5;
+constexpr int kObstacleThresh = 2;
 constexpr int kCollWallThresh = 10;
-constexpr int kZoneWallThresh = 200; //TODO
-constexpr int kTargetThresh = -1; // TODO
+constexpr int kZoneWallThresh = 2000; //TODO
+constexpr int kTargetThresh = 5; // TODO
+constexpr int kOriginThresh = 10;
+
+constexpr int kZoneX = 10; 
+constexpr int kZoneY = 10;
 
 int state;
 
@@ -14,12 +18,22 @@ void setup(){
     setupMotors();
     setupUltrasonicSensors();
     setupClaw();
-    setupGyroscope();
+//    setupGyroscope();
     
     state = 0;
 }
 
 void loop(){
+  /*
+    moveForward();
+    delay(5000);
+    moveBackward();
+    delay(5000);
+    strafeLeft();
+    delay(5000);
+    strafeRight();
+    delay(5000);
+    */
     switch(state) {
       case 0: // Navigate obstacles
         int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
@@ -34,14 +48,52 @@ void loop(){
             int wall_L = getDistanceFromSensor(kTrigL, kEchoL);
             int wall_R = getDistanceFromSensor(kTrigR, kEchoR);
             if ((wall_L + wall_R) > kZoneWallThresh) {
+                moveForward();
+                delay(5);
+                stopMove();
                 ++state;
             }
         }
+        break;
       case 1: // Find target
-        ++state;
+        rotate(-90); // Rotate right
+        int obstacle_L = getDistanceFromSensor(kTrigL, kEchoL);
+        int obstacle_Front = getDistanceFromSensor(kTrigFM, kEchoFM);
+ 
+        if (obstacle_Front < kTargetThresh){
+            while (obstacle_Front > kObstacleThresh){
+                moveForward();
+            }
+            stopMove();
+            openClaw();
+            closeClaw();
+            state++;
+        } else if (obstacle_L > kCollWallThresh){
+            strafeLeft();
+        }
+        break;
       case 2: // Transport target
+        rotate(180);
+        int obstacle_R = getDistanceFromSensor(kTrigR, kEchoR);
+        int wall_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
+        int wall_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
+ 
+        while (obstacle_R > kCollWallThresh){ // Strafe right till aligned with wall
+            strafeRight();
+        }
+        while (wall_FL < kOriginThresh && wall_FR < kOriginThresh){ // move forward till reach top right corner
+            moveForward();
+        }
+        stopMove();
+        
+        int currX = 0;
+        int currY = 0;
+ 
+        while (currX < kZoneX){
+            
+        }
         ++state;
-      case 3: // Finish execution
+     case 3: // Finish execution
         return;
     }
 }

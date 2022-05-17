@@ -3,14 +3,14 @@
 #include <Arduino.h>
 
 // -------------- DEFINE PINS --------------
-const int FrontRightF = 13;
-const int FrontRightB = 12;
-const int BackRightF = 11;
-const int BackRightB = 10;
-const int FrontLeftF = 9;
-const int FrontLeftB = 8;
-const int BackLeftF = 7;
-const int BackLeftB = 6;
+const int FrontRightF = 43;
+const int FrontRightB = 42;
+const int BackRightF = 41;
+const int BackRightB = 40;
+const int FrontLeftF = 39;
+const int FrontLeftB = 38;
+const int BackLeftF = 37;
+const int BackLeftB = 36;
 // RIGHT H-Bridge pins
 const int ENAright = A0; // Enables motor 
 const int ENBright = A2;
@@ -22,6 +22,7 @@ void setupMotors();
 
 // Stops all motors
 void stopMove();
+void testMotor();
 
 // Individual Motor Controllers
 void setFrontLeft(int speed);

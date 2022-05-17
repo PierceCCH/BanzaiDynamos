@@ -1,34 +1,29 @@
 #include "motorControllers.h"
 #include "gyroscope.h"
-#include "ArduPID.h"
-
-ArduPID myController;
-
-// ------- PID Variables -------
-double setpoint = 512;
-double input;
-double output;
-double p = 1;
-double i = 1;
-double d = 1;
 
 void setupMotors(){
     for (int i = BackLeftB; i <= FrontRightF; i++){
         pinMode(i, OUTPUT);
+        digitalWrite(i, LOW);
     }
     pinMode (ENAright, OUTPUT);
     pinMode (ENBright, OUTPUT);
     pinMode (ENAleft, OUTPUT);
     pinMode (ENBleft, OUTPUT);
-    myController.begin(&input, &output, &setpoint, p, i, d);
 }
 
 void stopMove(){
-  myController.stop();
   analogWrite(ENAleft, 0);
   analogWrite(ENBleft, 0); 
   analogWrite(ENAright, 0);
   analogWrite(ENBright, 0); 
+}
+
+void testMotor(){
+    digitalWrite( FrontLeftF, HIGH);
+    digitalWrite( FrontLeftB, LOW);
+    analogWrite(ENAleft, 255);
+    analogWrite(ENBleft, 255);
 }
 
 void setFrontRight(int speed){
@@ -68,11 +63,11 @@ void setFrontLeft(int speed){
     analogWrite(ENAleft, 0);    
   } else if( speed>0 ) {
     digitalWrite( FrontLeftF, HIGH );
-    digitalWrite( FrontRightB, LOW );
+    digitalWrite( FrontLeftB, LOW );
     analogWrite ( ENAleft, speed);        
   } else {
     digitalWrite( FrontLeftF, LOW );
-    digitalWrite( FrontRightB, HIGH );
+    digitalWrite( FrontLeftB, HIGH );
     analogWrite ( ENAleft, -speed);            
   }
 }
