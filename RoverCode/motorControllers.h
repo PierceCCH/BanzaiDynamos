@@ -13,10 +13,10 @@ const int BackLeftF = 7;
 const int BackLeftB = 6;
 // RIGHT H-Bridge pins
 const int ENAright = A0; // Enables motor 
-const int ENBright = A1;
+const int ENBright = A2;
 // LEFT H-Bridge 
-const int ENAleft = A2;
-const int ENBleft = A3;
+const int ENAleft = A3;
+const int ENBleft = A4;
 
 void setupMotors();
 
