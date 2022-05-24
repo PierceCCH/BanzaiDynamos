@@ -6,34 +6,80 @@
 // Tested on 17 September 2019
 // ---------------------------------------------------------------- //
 
-#define echoPin 8 // attach pin D2 Arduino to pin Echo of HC-SR04
-#define trigPin 9 //attach pin D3 Arduino to pin Trig of HC-SR04
+constexpr int kEchoFL = 22;
+constexpr int kTrigFL = 23;
+constexpr int kEchoFM = 24;
+constexpr int kTrigFM = 25;
+constexpr int kEchoFR = 26;
+constexpr int kTrigFR = 27;
+constexpr int kEchoL = 28;
+constexpr int kTrigL = 29;
+constexpr int kEchoR = 30;
+constexpr int kTrigR = 31;
+constexpr int kEchoB = 32;
+constexpr int kTrigB = 33;
 
 // defines variables
 long duration; // variable for the duration of sound wave travel
 int distance; // variable for the distance measurement
 
 void setup() {
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
-  pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
-  Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
-  Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
-  Serial.println("with Arduino UNO R3");
+  Serial.begin(9600);
+  /*
+  for (int i = kEchoFL; i <= kTrigB; i++){
+    if (i%2 == 0){ // ECHO PINS MUST BE EVEN PINS
+        Serial.print("Echo pin: ");
+        Serial.print(i);
+        Serial.print('\n');
+        pinMode(i, INPUT);
+    } else { // TRIG PINS MUST BE ODD PINS
+        Serial.print("Trig pin: ");
+        Serial.print(i);
+        Serial.print('\n');
+        pinMode(i, OUTPUT);
+    }
+  } */
+//  pinMode(kTrigB, OUTPUT);
+//  pinMode(kEchoB, INPUT);
+//  pinMode(kTrigR, OUTPUT);
+//  pinMode(kEchoR, INPUT);
+  pinMode(8, INPUT);
+  pinMode(9, OUTPUT);
+  
 }
 void loop() {
   // Clears the trigPin condition
-  digitalWrite(trigPin, LOW);
+  digitalWrite(9, LOW);
   delayMicroseconds(2);
   // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
-  digitalWrite(trigPin, HIGH);
+  digitalWrite(9, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
+  digitalWrite(9, LOW);
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
+  duration = pulseIn(8, HIGH);
   // Calculating the distance
   distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
   // Displays the distance on the Serial Monitor
-  Serial.print("Distance: ");
+  Serial.print("Distance B: ");
   Serial.print(distance);
   Serial.println(" cm");
+
+// delay(100);
+//    // Clears the trigPin condition
+//  digitalWrite(kTrigR, LOW);
+//  delayMicroseconds(2);
+//  // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
+//  digitalWrite(kTrigR, HIGH);
+//  delayMicroseconds(10);
+//  digitalWrite(kTrigR, LOW);
+//  // Reads the echoPin, returns the sound wave travel time in microseconds
+//  duration = pulseIn(kEchoR, HIGH);
+//  // Calculating the distance
+//  distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
+//  // Displays the distance on the Serial Monitor
+//  Serial.print("Distance R: ");
+//  Serial.print(distance);
+//  Serial.println(" cm");
+//  delay(100);
+
 }

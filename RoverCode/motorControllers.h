@@ -12,7 +12,7 @@ const int FrontLeftB = 38;
 const int BackLeftF = 37;
 const int BackLeftB = 36;
 // RIGHT H-Bridge pins
-const int ENAright = A0; // Enables motor 
+const int ENAright = A1; // Enables motor 
 const int ENBright = A2;
 // LEFT H-Bridge 
 const int ENAleft = A3;

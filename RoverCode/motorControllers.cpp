@@ -4,7 +4,6 @@
 void setupMotors(){
     for (int i = BackLeftB; i <= FrontRightF; i++){
         pinMode(i, OUTPUT);
-        digitalWrite(i, LOW);
     }
     pinMode (ENAright, OUTPUT);
     pinMode (ENBright, OUTPUT);

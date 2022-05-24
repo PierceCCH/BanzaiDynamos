@@ -3,7 +3,8 @@
 #include "clawController.h"
 #include "gyroscope.h"
 
-constexpr int kObstacleThresh = 2;
+
+constexpr int kObstacleThresh = 15;
 constexpr int kCollWallThresh = 10;
 constexpr int kZoneWallThresh = 2000; //TODO
 constexpr int kTargetThresh = 5; // TODO
@@ -15,6 +16,7 @@ constexpr int kZoneY = 10;
 int state;
 
 void setup(){
+    Serial.begin(9600);
     setupMotors();
     setupUltrasonicSensors();
     setupClaw();
@@ -22,9 +24,27 @@ void setup(){
     
     state = 0;
 }
-
 void loop(){
   /*
+   closeClaw();
+   delay(500);
+   openClaw();
+   */
+     Serial.print("FR ");
+              Serial.println(getDistanceFromSensor(kTrigFR, kEchoFR));
+              Serial.print("FM ");
+        Serial.println(getDistanceFromSensor(kTrigFM, kEchoFM));
+       
+        Serial.print("FL ");
+        Serial.println(getDistanceFromSensor(kTrigFL, kEchoFL));
+       
+        Serial.print("L ");
+        Serial.println(getDistanceFromSensor(kTrigL, kEchoL));
+        Serial.print("R ");
+        Serial.println(getDistanceFromSensor(kTrigR, kEchoR));
+        Serial.print("B ");
+        Serial.println(getDistanceFromSensor(kTrigB, kEchoB));
+        /*
     moveForward();
     delay(5000);
     moveBackward();
@@ -38,6 +58,7 @@ void loop(){
       case 0: // Navigate obstacles
         int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
         int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
+
         if (obstacle_FL < kObstacleThresh || obstacle_FR < kObstacleThresh) {
             stopMove();
             avoidObstacle();
@@ -47,12 +68,14 @@ void loop(){
             moveForward();
             int wall_L = getDistanceFromSensor(kTrigL, kEchoL);
             int wall_R = getDistanceFromSensor(kTrigR, kEchoR);
+            /*
             if ((wall_L + wall_R) > kZoneWallThresh) {
                 moveForward();
-                delay(5);
+                //delay(5);
                 stopMove();
-                ++state;
+                //++state;
             }
+            */
         }
         break;
       case 1: // Find target
