@@ -1,5 +1,7 @@
 #include "gyroscope.h"
 
+// Not used in Rover
+
 MPU6050 mpu(Wire); // -- Gyroscope
 
 void setupGyroscope(){

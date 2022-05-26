@@ -1,61 +1,45 @@
 #include "motorControllers.h"
 #include "ultrasonicSensors.h"
 #include "clawController.h"
-#include "gyroscope.h"
 
+constexpr int kObstacleThresh = 10; // for frontal sensors
+constexpr int kCollWallThresh = 10; // for side sensors
+constexpr int kZoneWallThresh = 1500;
+constexpr int kTargetThresh = 50; // Change to length of right part of zone
 
-constexpr int kObstacleThresh = 15;
-constexpr int kCollWallThresh = 10;
-constexpr int kZoneWallThresh = 2000; //TODO
-constexpr int kTargetThresh = 5; // TODO
-constexpr int kOriginThresh = 10;
+constexpr double kZoneX = 10; // X coordinate of drop zone in cm
+constexpr double kZoneY = 10; // Y coordinate of drop zone in cm
 
-constexpr int kZoneX = 10; 
-constexpr int kZoneY = 10;
+constexpr double speedX = 10 // front back speed of rover in cm/s
+constexpr double speedY = 10 // strafe speed of rover in cm/s
 
-int state;
+int state = 0;
+bool final_zone = false;
 
 void setup(){
     Serial.begin(9600);
     setupMotors();
     setupUltrasonicSensors();
     setupClaw();
-//    setupGyroscope();
-    
-    state = 0;
 }
+
 void loop(){
-  /*
-   closeClaw();
-   delay(500);
-   openClaw();
-   */
-     Serial.print("FR ");
-              Serial.println(getDistanceFromSensor(kTrigFR, kEchoFR));
-              Serial.print("FM ");
-        Serial.println(getDistanceFromSensor(kTrigFM, kEchoFM));
-       
-        Serial.print("FL ");
-        Serial.println(getDistanceFromSensor(kTrigFL, kEchoFL));
-       
-        Serial.print("L ");
-        Serial.println(getDistanceFromSensor(kTrigL, kEchoL));
-        Serial.print("R ");
-        Serial.println(getDistanceFromSensor(kTrigR, kEchoR));
-        Serial.print("B ");
-        Serial.println(getDistanceFromSensor(kTrigB, kEchoB));
-        /*
-    moveForward();
-    delay(5000);
-    moveBackward();
-    delay(5000);
-    strafeLeft();
-    delay(5000);
-    strafeRight();
-    delay(5000);
-    */
-    switch(state) {
-      case 0: // Navigate obstacles
+/*
+    Serial.print("FR ");
+    Serial.println(getDistanceFromSensor(kTrigFR, kEchoFR));
+    Serial.print("FM ");
+    Serial.println(getDistanceFromSensor(kTrigFM, kEchoFM));
+    Serial.print("FL ");
+    Serial.println(getDistanceFromSensor(kTrigFL, kEchoFL));
+    Serial.print("L ");
+    Serial.println(getDistanceFromSensor(kTrigL, kEchoL));
+    Serial.print("R ");
+    Serial.println(getDistanceFromSensor(kTrigR, kEchoR));
+    Serial.print("B ");
+    Serial.println(getDistanceFromSensor(kTrigB, kEchoB));
+*/
+
+    if (state == 0) { // Navigate obstacles
         int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
         int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
 
@@ -68,56 +52,71 @@ void loop(){
             moveForward();
             int wall_L = getDistanceFromSensor(kTrigL, kEchoL);
             int wall_R = getDistanceFromSensor(kTrigR, kEchoR);
-            /*
+            
             if ((wall_L + wall_R) > kZoneWallThresh) {
                 moveForward();
-                //delay(5);
+                delay(100);
                 stopMove();
-                //++state;
+                ++state;
+                delay(1000);
             }
-            */
         }
-        break;
-      case 1: // Find target
-        rotate(-90); // Rotate right
+    } else if (state == 1) { // Find target
+        if (!final_zone) {
+            rotate(1); // Rotate CW
+            final_zone = true;
+        }
         int obstacle_L = getDistanceFromSensor(kTrigL, kEchoL);
         int obstacle_Front = getDistanceFromSensor(kTrigFM, kEchoFM);
  
-        if (obstacle_Front < kTargetThresh){
-            while (obstacle_Front > kObstacleThresh){
+        if (obstacle_Front < kTargetThresh){ // Spotted target
+            while (obstacle_Front > kObstacleThresh){ // Move forward towards target if no obstacles
+                obstacle_Front = getDistanceFromSensor(kTrigFM, kEchoFM);
                 moveForward();
             }
             stopMove();
-            openClaw();
+            Serial.print("Close claw");
             closeClaw();
-            state++;
-        } else if (obstacle_L > kCollWallThresh){
-            strafeLeft();
+            ++state;
+        } else {
+            if (obstacle_L > kCollWallThresh){ // Strafe left to scan for target
+                strafeLeft();
+                obstacle_L = getDistanceFromSensor(kTrigL, kEchoL);
+            }
         }
-        break;
-      case 2: // Transport target
-        rotate(180);
-        int obstacle_R = getDistanceFromSensor(kTrigR, kEchoR);
-        int wall_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
-        int wall_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
+    } else if (state == 2) { // Transport target
+        int obstacle_L = getDistanceFromSensor(kTrigL, kEchoL);
+        int wall_B = getDistanceFromSensor(kTrigB, kEchoB);
  
-        while (obstacle_R > kCollWallThresh){ // Strafe right till aligned with wall
+        while (obstacle_L > kCollWallThresh){ // Strafe left till aligned with wall
             strafeRight();
+            obstacle_L = getDistanceFromSensor(kTrigL, kEchoL);
         }
-        while (wall_FL < kOriginThresh && wall_FR < kOriginThresh){ // move forward till reach top right corner
-            moveForward();
+        while (wall_B < kCollWallThresh){ // move forward till reach top right corner
+            moveBackward();
+            wall_B = getDistanceFromSensor(kTrigB, kEchoB);
         }
         stopMove();
         
-        int currX = 0;
-        int currY = 0;
- 
-        while (currX < kZoneX){
-            
-        }
+        // Move to drop zone
+        moveForward();
+        delay( ( kZoneX / speedX ) * 1000);
+        strafeRight();
+        delay( ( kZoneY / speedY ) * 1000);
+
+        delay(500); // Drop cylinder
+        openClaw();
+
+        moveBackward();
+        delay(500;)
+
         ++state;
-     case 3: // Finish execution
+    } else if (state == 3) { // Finish execution
         return;
+    } else {
+      Serial.print("invalid state: ");
+      Serial.println(state);
+      return;
     }
 }
 
@@ -127,13 +126,10 @@ void avoidObstacle() {
     if (obstacle_FL < kObstacleThresh) {
         if (obstacle_FR < kObstacleThresh) {
             int random_dir = random(0, 2);
-            switch(random_dir) {
-              case 0:
+            if (random_dir == 0) {
                 strafeLeft();
-                break;
-              case 1:
+            } else {
                 strafeRight();
-                break;
             }
             
             int wall_L;

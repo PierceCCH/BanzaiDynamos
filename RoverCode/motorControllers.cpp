@@ -134,31 +134,22 @@ void strafeRight(){
   setBackLeft(-255);
 }
 
-void rotate(int angle){
-  /*
-    Angle POSITIVE for ACW rotation, negative for CW rotation
-  */
-  int currentAngle = getYaw();
-  int finalAngle = currentAngle + angle;
-  
-  while (abs(currentAngle) < abs(finalAngle - 1)){ // Allow for a certain threshold
-    if (angle < 0){ // ACW rotation
-      setFrontRight(255);
-      setBackLeft(-255);
-      setBackRight(255);
-      setFrontLeft(-255);
-      delay(10); // time spent rotating
-      stopMove();
-    } else { // CW rotation
-      setFrontRight(-255);
-      setBackLeft(255);
-      setBackRight(-255);
-      setFrontLeft(255);      
-      delay(10);
-      stopMove();
-    }
-    currentAngle = getYaw();
-    Serial.println(currentAngle);
-    Serial.println(finalAngle);
+/*
+  Rotates rover 90 degrees.
+  dir POSITIVE for CW rotation, negative for ACW rotation.
+*/
+void rotate(int dir){
+  if (dir < 0){ // ACW rotation
+    setFrontRight(255);
+    setBackLeft(-255);
+    setBackRight(255);
+    setFrontLeft(-255);
+    delay(750); // time spent rotating in ms
+  } else { // CW rotation
+    setFrontRight(-255);
+    setBackLeft(255);
+    setBackRight(-255);
+    setFrontLeft(255);      
+    delay(750);
   }
 }
