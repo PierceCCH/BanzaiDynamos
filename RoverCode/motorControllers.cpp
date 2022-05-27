@@ -2,7 +2,7 @@
 #include "gyroscope.h"
 
 void setupMotors(){
-    for (int i = BackLeftB; i <= FrontRightF; i++){
+    for (int i = FrontRightB; i <= BackRightF; i++){
         pinMode(i, OUTPUT);
     }
     pinMode (ENAright, OUTPUT);
@@ -18,70 +18,63 @@ void stopMove(){
   analogWrite(ENBright, 0); 
 }
 
-void testMotor(){
-    digitalWrite( FrontLeftF, HIGH);
-    digitalWrite( FrontLeftB, LOW);
-    analogWrite(ENAleft, 255);
-    analogWrite(ENBleft, 255);
-}
-
 void setFrontRight(int speed){
   if( speed==0 ) {
-    digitalWrite( FrontRightF, HIGH );
-    digitalWrite( FrontRightB, HIGH );
+    digitalWrite( FrontRightF, LOW );
+    digitalWrite( FrontRightB, LOW );
     analogWrite(ENAright, 0);    
   } else if( speed>0 ) {
-    digitalWrite( FrontRightF, HIGH );
+    analogWrite( FrontRightF, speed );
     digitalWrite( FrontRightB, LOW );
     analogWrite ( ENAright, speed);        
   } else {
     digitalWrite( FrontRightF, LOW );
-    digitalWrite( FrontRightB, HIGH );
+    analogWrite( FrontRightB, -speed );
     analogWrite ( ENAright, -speed);            
   }
 }
 void setBackRight(int speed){
   if( speed==0 ) {
-    digitalWrite( BackRightF, HIGH );
-    digitalWrite( BackRightB, HIGH );
+    digitalWrite( BackRightF, LOW );
+    digitalWrite( BackRightB, LOW );
     analogWrite(ENBright, 0);    
   } else if( speed>0 ) {
-    digitalWrite( BackRightF, HIGH );
+    analogWrite( BackRightF, speed );
     digitalWrite( BackRightB, LOW );
     analogWrite ( ENBright, speed);        
   } else {
-    digitalWrite( BackRightF, LOW );
-    digitalWrite( BackRightB, HIGH );
+    digitalWrite( BackRightF, 0 );
+    analogWrite( BackRightB, -speed );
     analogWrite ( ENBright, -speed);            
   }
 }
 void setFrontLeft(int speed){
   if( speed==0 ) {
-    digitalWrite( FrontLeftF, HIGH );
-    digitalWrite( FrontLeftB, HIGH );
+    digitalWrite( FrontLeftF, LOW );
+    digitalWrite( FrontLeftB, LOW );
     analogWrite(ENAleft, 0);    
   } else if( speed>0 ) {
-    digitalWrite( FrontLeftF, HIGH );
+    analogWrite( FrontLeftF, speed );
     digitalWrite( FrontLeftB, LOW );
     analogWrite ( ENAleft, speed);        
   } else {
     digitalWrite( FrontLeftF, LOW );
-    digitalWrite( FrontLeftB, HIGH );
+    analogWrite( FrontLeftB, -speed );
     analogWrite ( ENAleft, -speed);            
   }
 }
 void setBackLeft(int speed){
   if( speed==0 ) {
-    digitalWrite( BackLeftF, HIGH );
-    digitalWrite( BackLeftB, HIGH );
+    digitalWrite( BackLeftF, LOW );
+    digitalWrite( BackLeftB, LOW );
     analogWrite(ENBleft, 0);    
   } else if( speed>0 ) {
-    digitalWrite( BackLeftF, HIGH );
+    analogWrite( BackLeftF, speed );
     digitalWrite( BackLeftB, LOW );
     analogWrite ( ENBleft, speed);        
   } else {
     digitalWrite( BackLeftF, LOW );
-    digitalWrite( BackLeftB, HIGH );
+    analogWrite( BackLeftB, -speed );
     analogWrite ( ENBleft, -speed);            
   }
 }
@@ -92,10 +85,10 @@ void setBackLeft(int speed){
   BL -> FORWARDS  | BR -> FORWARDS
 ----------------------------------*/
 void moveForward(){
-  setFrontRight(255);
+  setFrontRight(0);
   setBackRight(255);
-  setFrontLeft(255);
-  setBackLeft(255);
+  setFrontLeft(0);
+  setBackLeft(0);
 }
 
 /*----------------------------------
@@ -144,12 +137,12 @@ void rotate(int dir){
     setBackLeft(-255);
     setBackRight(255);
     setFrontLeft(-255);
-    delay(750); // time spent rotating in ms
+    delay(250); // time spent rotating in ms
   } else { // CW rotation
     setFrontRight(-255);
     setBackLeft(255);
     setBackRight(-255);
     setFrontLeft(255);      
-    delay(750);
+    delay(250);
   }
 }

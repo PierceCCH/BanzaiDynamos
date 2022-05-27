@@ -3,17 +3,17 @@
 #include "clawController.h"
 
 constexpr int kObstacleThresh = 10; // for frontal sensors
-constexpr int kCollWallThresh = 10; // for side sensors
-constexpr int kZoneWallThresh = 1500;
-constexpr int kTargetThresh = 50; // Change to length of right part of zone
+constexpr int kCollWallThresh = 15; // for side sensors
+constexpr int kZoneWallThresh = 300;
+constexpr int kTargetThresh = 10; // Change to length of right part of zone
 
 constexpr double kZoneX = 10; // X coordinate of drop zone in cm
 constexpr double kZoneY = 10; // Y coordinate of drop zone in cm
 
-constexpr double speedX = 10 // front back speed of rover in cm/s
-constexpr double speedY = 10 // strafe speed of rover in cm/s
+constexpr double speedX = 10; // front back speed of rover in cm/s
+constexpr double speedY = 10; // strafe speed of rover in cm/s
 
-int state = 0;
+int state = 1;
 bool final_zone = false;
 
 void setup(){
@@ -24,7 +24,7 @@ void setup(){
 }
 
 void loop(){
-/*
+  
     Serial.print("FR ");
     Serial.println(getDistanceFromSensor(kTrigFR, kEchoFR));
     Serial.print("FM ");
@@ -37,8 +37,9 @@ void loop(){
     Serial.println(getDistanceFromSensor(kTrigR, kEchoR));
     Serial.print("B ");
     Serial.println(getDistanceFromSensor(kTrigB, kEchoB));
-*/
-
+    moveForward();
+  
+/*
     if (state == 0) { // Navigate obstacles
         int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
         int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
@@ -108,7 +109,7 @@ void loop(){
         openClaw();
 
         moveBackward();
-        delay(500;)
+        delay(500);
 
         ++state;
     } else if (state == 3) { // Finish execution
@@ -117,13 +118,14 @@ void loop(){
       Serial.print("invalid state: ");
       Serial.println(state);
       return;
-    }
+    }*/
 }
 
 void avoidObstacle() {
     int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
+    int obstacle_FM = getDistanceFromSensor(kTrigFM, kEchoFM);
     int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
-    if (obstacle_FL < kObstacleThresh) {
+    if (obstacle_FL < kObstacleThresh || obstacle_FL < kObstacleThresh) {
         if (obstacle_FR < kObstacleThresh) {
             int random_dir = random(0, 2);
             if (random_dir == 0) {
@@ -136,11 +138,13 @@ void avoidObstacle() {
             int wall_R;
             for (;;) {
                 obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
+                obstacle_FM = getDistanceFromSensor(kTrigFM, kEchoFM);
                 obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
                 wall_L = getDistanceFromSensor(kTrigL, kEchoL);
                 wall_R = getDistanceFromSensor(kTrigR, kEchoR);
                 if (!(obstacle_FL < kObstacleThresh ||
-                        obstacle_FR < kObstacleThresh)) {
+                      obstacle_FM < kObstacleThresh ||
+                      obstacle_FR < kObstacleThresh)) {
                     stopMove();
                     return;
                 }
