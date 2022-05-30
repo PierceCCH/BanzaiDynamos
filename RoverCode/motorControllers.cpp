@@ -20,61 +20,53 @@ void stopMove(){
 
 void setFrontRight(int speed){
   if( speed==0 ) {
-    digitalWrite( FrontRightF, LOW );
-    digitalWrite( FrontRightB, LOW );
     analogWrite(ENAright, 0);    
   } else if( speed>0 ) {
-    analogWrite( FrontRightF, speed );
+    digitalWrite( FrontRightF, HIGH );
     digitalWrite( FrontRightB, LOW );
     analogWrite ( ENAright, speed);        
   } else {
     digitalWrite( FrontRightF, LOW );
-    analogWrite( FrontRightB, -speed );
+    digitalWrite( FrontRightB, HIGH );
     analogWrite ( ENAright, -speed);            
   }
 }
 void setBackRight(int speed){
   if( speed==0 ) {
-    digitalWrite( BackRightF, LOW );
-    digitalWrite( BackRightB, LOW );
     analogWrite(ENBright, 0);    
   } else if( speed>0 ) {
-    analogWrite( BackRightF, speed );
+    digitalWrite( BackRightF, HIGH );
     digitalWrite( BackRightB, LOW );
     analogWrite ( ENBright, speed);        
   } else {
-    digitalWrite( BackRightF, 0 );
-    analogWrite( BackRightB, -speed );
+    digitalWrite( BackRightF, LOW );
+    digitalWrite( BackRightB, HIGH );
     analogWrite ( ENBright, -speed);            
   }
 }
 void setFrontLeft(int speed){
   if( speed==0 ) {
-    digitalWrite( FrontLeftF, LOW );
-    digitalWrite( FrontLeftB, LOW );
     analogWrite(ENAleft, 0);    
   } else if( speed>0 ) {
-    analogWrite( FrontLeftF, speed );
+    digitalWrite( FrontLeftF, HIGH );
     digitalWrite( FrontLeftB, LOW );
     analogWrite ( ENAleft, speed);        
   } else {
     digitalWrite( FrontLeftF, LOW );
-    analogWrite( FrontLeftB, -speed );
+    digitalWrite( FrontLeftB, HIGH );
     analogWrite ( ENAleft, -speed);            
   }
 }
 void setBackLeft(int speed){
   if( speed==0 ) {
-    digitalWrite( BackLeftF, LOW );
-    digitalWrite( BackLeftB, LOW );
     analogWrite(ENBleft, 0);    
   } else if( speed>0 ) {
-    analogWrite( BackLeftF, speed );
+    digitalWrite( BackLeftF, HIGH );
     digitalWrite( BackLeftB, LOW );
     analogWrite ( ENBleft, speed);        
   } else {
     digitalWrite( BackLeftF, LOW );
-    analogWrite( BackLeftB, -speed );
+    digitalWrite( BackLeftB, HIGH );
     analogWrite ( ENBleft, -speed);            
   }
 }
@@ -85,10 +77,10 @@ void setBackLeft(int speed){
   BL -> FORWARDS  | BR -> FORWARDS
 ----------------------------------*/
 void moveForward(){
-  setFrontRight(0);
+  setFrontRight(150);
   setBackRight(255);
-  setFrontLeft(0);
-  setBackLeft(0);
+  setFrontLeft(150);
+  setBackLeft(150);
 }
 
 /*----------------------------------
@@ -128,21 +120,22 @@ void strafeRight(){
 }
 
 /*
-  Rotates rover 90 degrees.
+  Rotates rover
   dir POSITIVE for CW rotation, negative for ACW rotation.
 */
-void rotate(int dir){
+void rotate(int dir, int del){
   if (dir < 0){ // ACW rotation
     setFrontRight(255);
     setBackLeft(-255);
     setBackRight(255);
     setFrontLeft(-255);
-    delay(250); // time spent rotating in ms
+    delay(del); // time spent rotating in ms
   } else { // CW rotation
     setFrontRight(-255);
     setBackLeft(255);
     setBackRight(-255);
     setFrontLeft(255);      
-    delay(250);
+    delay(del);
   }
+  stopMove();
 }

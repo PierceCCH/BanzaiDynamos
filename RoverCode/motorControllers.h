@@ -35,7 +35,7 @@ void moveForward();
 void moveBackward();
 void strafeLeft();
 void strafeRight();
-void rotate(int angle);
+void rotate(int angle, int del);
 
 void calculatePID();
 

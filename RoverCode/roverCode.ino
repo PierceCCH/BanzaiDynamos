@@ -2,9 +2,9 @@
 #include "ultrasonicSensors.h"
 #include "clawController.h"
 
-constexpr int kObstacleThresh = 10; // for frontal sensors
-constexpr int kCollWallThresh = 15; // for side sensors
-constexpr int kZoneWallThresh = 300;
+constexpr int kObstacleThresh = 25;        ; // for frontal sensors
+constexpr int kCollWallThresh = 25; // for side sensors
+constexpr int kZoneWallThresh = 150;
 constexpr int kTargetThresh = 10; // Change to length of right part of zone
 
 constexpr double kZoneX = 10; // X coordinate of drop zone in cm
@@ -13,7 +13,7 @@ constexpr double kZoneY = 10; // Y coordinate of drop zone in cm
 constexpr double speedX = 10; // front back speed of rover in cm/s
 constexpr double speedY = 10; // strafe speed of rover in cm/s
 
-int state = 1;
+int state = 0;
 bool final_zone = false;
 
 void setup(){
@@ -21,6 +21,7 @@ void setup(){
     setupMotors();
     setupUltrasonicSensors();
     setupClaw();
+    rotate(1, 550);
 }
 
 void loop(){
@@ -37,9 +38,7 @@ void loop(){
     Serial.println(getDistanceFromSensor(kTrigR, kEchoR));
     Serial.print("B ");
     Serial.println(getDistanceFromSensor(kTrigB, kEchoB));
-    moveForward();
-  
-/*
+  /*
     if (state == 0) { // Navigate obstacles
         int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
         int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
@@ -64,9 +63,18 @@ void loop(){
         }
     } else if (state == 1) { // Find target
         if (!final_zone) {
-            rotate(1); // Rotate CW
+            rotate(-1, 50); // Rotate CW
+            int obstacle_Front = getDistanceFromSensor(kTrigFM, kEchoFM);
+            while (obstacle_Front > 2){
+              moveForward();
+              obstacle_Front = getDistanceFromSensor(kTrigFM, kEchoFM);
+            }
+            stopMove();
             final_zone = true;
         }
+        moveBackward();
+        delay(1500);
+        rotate(1, 500);
         int obstacle_L = getDistanceFromSensor(kTrigL, kEchoL);
         int obstacle_Front = getDistanceFromSensor(kTrigFM, kEchoFM);
  
@@ -125,7 +133,7 @@ void avoidObstacle() {
     int obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
     int obstacle_FM = getDistanceFromSensor(kTrigFM, kEchoFM);
     int obstacle_FR = getDistanceFromSensor(kTrigFR, kEchoFR);
-    if (obstacle_FL < kObstacleThresh || obstacle_FL < kObstacleThresh) {
+    if (obstacle_FL < kObstacleThresh || obstacle_FR < kObstacleThresh) {
         if (obstacle_FR < kObstacleThresh) {
             int random_dir = random(0, 2);
             if (random_dir == 0) {
@@ -158,7 +166,7 @@ void avoidObstacle() {
                 }
             }
         } else {
-            strafeRight();
+            strafeLeft();
             for (;;) {
                 obstacle_FL = getDistanceFromSensor(kTrigFL, kEchoFL);
                 if (!(obstacle_FL < kObstacleThresh)) {
